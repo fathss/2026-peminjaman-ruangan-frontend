@@ -4,8 +4,10 @@ function Navbar() {
   const navigate = useNavigate();
 
   function handleLogout() {
-    console.log("Logout clicked");
-    navigate("/login");
+    localStorage.removeItem("token");
+    localStorage.removeItem("username");
+    localStorage.removeItem("role");
+    navigate("/login", { replace: true });
   }
 
   return (
