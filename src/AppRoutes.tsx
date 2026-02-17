@@ -34,6 +34,9 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/rooms" element={<RoomPage />} />
+
+      {/* Default Routes */}
+      <Route path="/" element={<LoginPage />} />
     </Routes>
   );
 }
