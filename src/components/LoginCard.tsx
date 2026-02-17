@@ -3,13 +3,10 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import FormInput from "./FormInput";
 import { Loader2 } from "lucide-react";
+import type { AuthProps } from "../types";
 
-interface LoginCardProps {
-  title: string;
-  description: string;
-}
 
-function LoginCard({ title, description }: LoginCardProps) {
+function LoginCard({ title, description }: AuthProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);

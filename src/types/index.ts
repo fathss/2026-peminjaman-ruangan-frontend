@@ -18,42 +18,43 @@ export interface User {
 export interface Room {
   id: number;
   name: string;
-  type: string;
-  gedung: string;
+  location: string; 
   capacity: number;
-  floor: string;
-  isAvailable: boolean;
-  facilities: string[];
   description?: string;
-  image?: string;
+  isActive: boolean;
 }
 
 export interface Booking {
-  id: string;
-  room: string;
+  id: number;
   roomId?: number;
-  date: string;
-  time: string;
-  startDate?: string;
-  endDate?: string;
+  roomName: string;
+  roomDescription: string;
+  userName: string;
+  userEmail: string;
+  startTime: string;
+  endTime: string;
+  createdAt: string;
+  updatedAt?: string;
   status: BookingStatus;
-  user?: string;
-  nim?: string;
-  userId?: string;
-  purpose?: string;
-  responsiblePerson?: string;
+  purpose: string;
 }
 
-export interface Stat {
-  label: string;
-  value: string;
-  icon: string;
-  color: string;
+export interface StatusHistory {
+  oldStatus: string;
+  newStatus: string;
+  changedAt: string;
+  changedBy: string;
 }
 
 // ============================================
 // Component Props Types
 // ============================================
+
+export interface BackButtonProps {
+  to?: string;
+  label: string;
+  mb?: string;
+}
 
 export interface StatCardProps {
   label: string;
@@ -64,12 +65,11 @@ export interface StatCardProps {
 
 export interface RoomCardProps {
   room: Room;
-  onSelectRoom?: (roomId: number) => void;
+  isAdmin: boolean;
 }
 
 export interface BookingCardProps {
   booking: Booking;
-  onDetail?: (bookingId: string) => void;
 }
 
 export interface StatusBadgeProps {
@@ -98,6 +98,11 @@ export interface BookingSummaryProps {
   capacity: number;
 }
 
+export interface FormInputProps
+  extends React.InputHTMLAttributes<HTMLInputElement> {
+  label: string;
+}
+
 export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   icon?: React.ReactNode;
@@ -109,4 +114,9 @@ export interface FormTextAreaProps
   label: string;
   icon?: React.ReactNode;
   error?: string;
+}
+
+export interface AuthProps {
+  title: string;
+  description: string;
 }

@@ -1,9 +1,5 @@
 import React from "react";
-
-interface FormInputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
-  label: string;
-}
+import type { FormInputProps } from "../types";
 
 function FormInput({ label, ...inputProps }: FormInputProps) {
   return (

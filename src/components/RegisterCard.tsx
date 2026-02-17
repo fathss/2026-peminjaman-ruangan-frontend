@@ -3,13 +3,9 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "../api/axios";
 import FormInput from "./FormInput";
 import { Loader2 } from "lucide-react";
+import type { AuthProps } from "../types";
 
-interface RegisterCardProps {
-  title: string;
-  description: string;
-}
-
-function RegisterCard({ title, description }: RegisterCardProps) {
+function RegisterCard({ title, description }: AuthProps) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

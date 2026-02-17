@@ -2,6 +2,7 @@ import { useNavigate, Link } from "react-router-dom";
 
 function Navbar() {
   const navigate = useNavigate();
+  const userRole = localStorage.getItem("role");
 
   function handleLogout() {
     localStorage.removeItem("token");
@@ -16,7 +17,7 @@ function Navbar() {
       <div className="flex items-center gap-8">
         <h1 
           className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 tracking-tight cursor-pointer"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate(userRole === "Admin" ? "/admin/dashboard" : "/dashboard")}
         >
           PeminjamanRuangan
         </h1>
@@ -26,7 +27,11 @@ function Navbar() {
           <Link to="/rooms" className="hover:text-blue-600 transition-colors">
             Cari Ruangan
           </Link>
-          <Link to="/bookinghistory" className="hover:text-blue-600 transition-colors">
+          
+          <Link 
+            to={userRole === "Admin" ? "/admin/bookinghistory/all" : "/bookinghistory"} 
+            className="hover:text-blue-600 transition-colors"
+          >
             Riwayat Booking
           </Link>
         </div>
@@ -35,7 +40,9 @@ function Navbar() {
       {/* Kanan: Profil & Logout */}
       <div className="flex items-center gap-5">
         <div className="hidden sm:flex flex-col items-end mr-2">
-          <span className="text-xs font-bold text-gray-800">Administrator</span>
+          <span className="text-xs font-bold text-gray-800">
+            {userRole === "Admin" ? "Administrator" : localStorage.getItem("username")}
+          </span>
           <span className="text-[10px] text-gray-500 uppercase">Online</span>
         </div>
         

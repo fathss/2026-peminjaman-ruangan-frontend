@@ -2,98 +2,121 @@ import Navbar from "../../layouts/Navbar";
 import BackButton from "../../components/BackButton";
 import StatusBadge from "../../components/StatusBadge";
 import PageHeader from "../../components/PageHeader";
-import { Search, Filter, ExternalLink } from "lucide-react";
+import { Search, Filter, ExternalLink, Loader2, Inbox, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
-import type { Booking } from "../../types";
+import { useAllBookings } from "../../hooks/admin/useAdminAllBookings";
+import { formatFullDateTime } from "../../utils/dateFormatter";
 
 function AllBookingsPage() {
-  // Mock data peminjaman yang lebih lengkap
-  const allBookings = [
-    { id: "BR-001", user: "Rizky Ramadhan", room: "Lab Jaringan", date: "16 Feb 2026", status: "Pending", nim: "220103044" },
-    { id: "BR-002", user: "Siti Aminah", room: "Aula Syahdan", date: "17 Feb 2026", status: "Approved", nim: "220103012" },
-    { id: "BR-003", user: "Budi Santoso", room: "Kelas 402", date: "15 Feb 2026", status: "Rejected", nim: "220103055" },
-    { id: "BR-004", user: "Andini Putri", room: "Theater Room", date: "18 Feb 2026", status: "Pending", nim: "220103099" },
-  ];
+  const { 
+    filteredBookings, loading, searchTerm, 
+    setSearchTerm, statusFilter, setStatusFilter, refresh 
+  } = useAllBookings();
 
   return (
     <div className="min-h-screen bg-gray-50/50">
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-6 space-y-6">
-        <BackButton to="/admin/dashboard" label="Kembali ke Dashboard" />
+        <BackButton label="Kembali" />
 
-        <PageHeader title="Semua Peminjaman" subtitle="Kelola dan tinjau seluruh riwayat pengajuan ruangan." />
+        <PageHeader 
+          title="Semua Peminjaman" 
+          subtitle="Kelola dan tinjau seluruh riwayat pengajuan ruangan oleh user." 
+        />
 
-        {/* Search & Quick Filter */}
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-3 text-gray-400" size={18} />
+        {/* Search, Filter, & Refresh */}
+        <div className="flex flex-col md:flex-row items-center gap-4">
+          <div className="relative flex-1 w-full">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
             <input
               type="text"
-              placeholder="Cari Peminjam / ID..."
-              className="w-full pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm"
+              placeholder="Cari Peminjam atau Ruangan..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-12 pr-4 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all font-medium"
             />
           </div>
-          <button className="p-2.5 bg-white border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50">
-            <Filter size={20} />
+
+          <div className="relative w-full md:w-64">
+            <Filter className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-600" size={16} />
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="w-full pl-12 pr-10 py-3 bg-white border border-gray-200 rounded-2xl text-sm focus:ring-2 focus:ring-blue-500 outline-none shadow-sm transition-all appearance-none font-bold text-gray-700 cursor-pointer"
+            >
+              {["All", "Pending", "Approved", "Rejected", "OnGoing", "Completed"].map(status => (
+                <option key={status} value={status}>{status === "All" ? "Semua Status" : status}</option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" size={16} />
+          </div>
+
+          <button onClick={refresh} className="p-3.5 bg-white border border-gray-200 rounded-2xl text-gray-600 hover:bg-gray-50 shadow-sm active:scale-95">
+            <Loader2 className={loading ? 'animate-spin' : ''} size={20} />
           </button>
         </div>
 
         {/* Table Container */}
-        <div className="bg-white rounded-[2rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-left table-fixed">
+            <table className="w-full text-left">
               <thead className="bg-gray-50/50 border-b border-gray-100">
                 <tr className="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">
-                  <th className="px-8 py-5 w-1/4">Informasi Peminjam</th>
-                  <th className="px-8 py-5 w-1/4">Ruangan & Waktu</th>
-                  <th className="px-8 py-5 w-1/6">Status</th>
-                  <th className="px-8 py-5 w-1/6 text-right">Aksi</th>
+                  <th className="px-8 py-5">ID & Peminjam</th>
+                  <th className="px-8 py-5">Ruangan</th>
+                  <th className="px-8 py-5">Waktu Penggunaan</th>
+                  <th className="px-8 py-5">Status</th>
+                  <th className="px-8 py-5 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {allBookings.map((booking) => (
-                  <tr key={booking.id} className="hover:bg-blue-50/30 transition-colors group">
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-gray-800">{booking.user}</span>
-                        <span className="text-xs text-gray-400 font-medium">NIM: {booking.nim}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <div className="flex flex-col">
-                        <span className="font-bold text-gray-700 text-sm">{booking.room}</span>
-                        <span className="text-xs text-gray-400">{booking.date}</span>
-                      </div>
-                    </td>
-                    <td className="px-8 py-6">
-                      <StatusBadge status={booking.status} variant="label" />
-                    </td>
-                    <td className="px-8 py-6 text-right">
-                      <Link
-                        to={`/admin/roombookings/detail`}
-                        className="inline-flex items-center gap-2 bg-gray-50 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all shadow-sm"
-                      >
-                        <ExternalLink size={14} /> Detail
-                      </Link>
+                {loading ? (
+                   <tr><td colSpan={5} className="px-8 py-20 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" size={32} /></td></tr>
+                ) : filteredBookings.length > 0 ? (
+                  filteredBookings.map((booking) => {
+                    const [date, time] = formatFullDateTime(booking.startTime).split(', ');
+                    return (
+                      <tr key={booking.id} className="hover:bg-blue-50/30 transition-colors group">
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col">
+                            <span className="text-[10px] font-mono font-bold text-blue-600">BRK-{booking.id}</span>
+                            <span className="font-bold text-gray-800">{booking.userName}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-700 text-sm">{booking.roomName}</span>
+                            <span className="text-[10px] text-gray-400 uppercase font-black">{booking.roomDescription || 'No Description'}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <div className="flex flex-col text-xs font-medium text-gray-500">
+                            <span>{date}</span>
+                            <span className="text-[10px] text-gray-400 font-bold">{time}</span>
+                          </div>
+                        </td>
+                        <td className="px-8 py-6">
+                          <StatusBadge status={booking.status} variant="label" />
+                        </td>
+                        <td className="px-8 py-6 text-right">
+                          <Link to={`/admin/roombookings/detail/${booking.id}`} className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-xl text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">
+                            <ExternalLink size={14} /> Kelola
+                          </Link>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={5} className="px-8 py-20 text-center text-gray-400">
+                      <Inbox size={48} className="mx-auto mb-2 opacity-20" />
+                      <p className="font-bold">Data tidak ditemukan</p>
                     </td>
                   </tr>
-                ))}
+                )}
               </tbody>
             </table>
-          </div>
-
-          {/* Pagination Placeholder */}
-          <div className="p-6 border-t border-gray-50 flex justify-between items-center bg-gray-50/30">
-            <p className="text-xs text-gray-400 font-medium">Menampilkan 4 dari 124 data peminjaman</p>
-            <div className="flex gap-2">
-              <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold disabled:opacity-50" disabled>
-                Prev
-              </button>
-              <button className="px-4 py-2 bg-white border border-gray-200 rounded-lg text-xs font-bold">
-                Next
-              </button>
-            </div>
           </div>
         </div>
       </main>

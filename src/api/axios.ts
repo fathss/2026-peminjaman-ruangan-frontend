@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const API_URL = "http://localhost:5145/api"; 
+const API_URL = import.meta.env.VITE_API_URL;
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
@@ -28,7 +28,6 @@ axiosInstance.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response && error.response.status === 401) {
-      // Jika error 401 (Unauthorized), hapus token dan arahkan ke login
       localStorage.removeItem("token");
       window.location.href = "/login";
     }
