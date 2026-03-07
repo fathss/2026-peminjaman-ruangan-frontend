@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AddRoomPage from "./pages/admin/AddRoomPage";
 import EditRoomPage from "./pages/admin/EditRoomPage";
