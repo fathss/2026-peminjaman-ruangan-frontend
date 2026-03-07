@@ -1,73 +1,96 @@
-# React + TypeScript + Vite
+# Peminjaman Ruangan
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Sistem manajemen peminjaman ruangan berbasis Web API yang memungkinkan pengguna untuk memesan ruangan secara efisien dengan sistem persetujuan admin.
 
-Currently, two official plugins are available:
+## Description
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Project ini dibuat untuk mempermudah proses reservasi ruangan di lingkungan kampus. Sistem ini menangani konflik jadwal secara otomatis dan memberikan riwayat status peminjaman yang transparan bagi pengguna maupun administrator.
 
-## React Compiler
+## Features
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- Autentikasi pengguna (login dan register).
+- Dashboard user untuk melihat ringkasan booking.
+- Melihat daftar ruangan dan detail terkait.
+- Membuat booking ruangan.
+- Melihat riwayat booking.
+- Melihat detail booking dan mengedit booking.
+- Dashboard admin untuk monitoring data.
+- Admin dapat melihat seluruh booking.
+- Admin dapat melihat detail booking.
+- Admin dapat menambah dan mengedit data ruangan.
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- React 19
+- TypeScript
+- Vite
+- React Router DOM
+- Axios
+- Tailwind CSS
+- ESLint
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Installation
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+1. Clone repository ini:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/fathss/2026-peminjaman-ruangan-frontend.git
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+2. Masuk ke folder project:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd 2026-peminjaman-ruangan-frontend
 ```
+
+3. Install dependency:
+
+```bash
+npm install
+```
+
+4. Buat file environment:
+
+```bash
+cp .env.example .env
+```
+
+Jika file `.env.example` belum ada, buat file `.env` secara manual dan isi variabel sesuai bagian Environment Variables.
+
+## Usage
+
+Jalankan aplikasi dalam mode development:
+
+```bash
+npm run dev
+```
+
+Build untuk production:
+
+```bash
+npm run build
+```
+
+Preview hasil build:
+
+```bash
+npm run preview
+```
+
+Linting:
+
+```bash
+npm run lint
+```
+
+## Environment Variables
+
+Buat file `.env` di root project dan tambahkan:
+
+```env
+VITE_API_URL=http://localhost:8000/api
+```
+
+Keterangan:
+
+- `VITE_API_URL`: Base URL backend API yang digunakan oleh Axios instance di `src/api/axios.ts`.
