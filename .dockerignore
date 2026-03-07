@@ -1,0 +1,47 @@
+# Dependencies and build output
+node_modules
+dist
+dist-ssr
+coverage
+
+# Local metadata
+.git
+.gitignore
+
+# Logs and temp files
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment files (avoid sending secrets in build context)
+.env
+.env.*
+!.env.example
+
+# IDE/editor and OS files
+.vscode
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Docker metadata
+.dockerignore
+Dockerfile*
+docker-compose*.yml
+
+# Package manager and local cache artifacts
+.npm
+.cache
+tmp
+temp
+
+# Local-only environment overrides
+*.local
