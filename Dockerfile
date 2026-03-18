@@ -17,15 +17,18 @@ RUN npm run build
 # Serve the static files with Nginx
 FROM nginx:stable-alpine AS runtime
 
+# Default for local runs
+ENV PORT=80
+
 # Copy the build output (dist folder) from the first stage
 COPY --from=build /app/dist /usr/share/nginx/html
 
-# Copy custom nginx config
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Copy Nginx template
+COPY nginx.conf /etc/nginx/templates/default.conf.template
 
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-    CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
+    CMD wget -q -O /dev/null http://127.0.0.1:${PORT}/ || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]
