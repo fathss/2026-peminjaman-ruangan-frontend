@@ -12,16 +12,17 @@ export function useBookingDetail(id: string | undefined) {
     if (!id) return;
     try {
       setLoading(true);
-      const [detailRes, historyRes] = await Promise.all([
-        bookingService.getBookingById(id),
-        bookingService.getBookingHistory(id)
-      ]);
 
-      setBooking(detailRes.data);
-      setHistory(historyRes.data);
+      const res = await bookingService.getBookingById(id);
 
-      if (detailRes.data.status === "OnGoing") {
-        setProgress(calculateBookingProgress(detailRes.data.startTime, detailRes.data.endTime));
+      const roomDetailData = res.data.booking;
+      const roomHistoryData = res.data.histories;
+
+      setBooking(roomDetailData);
+      setHistory(roomHistoryData);
+
+      if (roomDetailData.status === "OnGoing") {
+        setProgress(calculateBookingProgress(roomDetailData.startTime, roomDetailData.endTime));
       }
     } catch (err) {
       console.error("Error fetching booking detail:", err);

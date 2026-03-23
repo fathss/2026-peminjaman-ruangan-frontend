@@ -12,12 +12,14 @@ export function useAdminBooking(id: string | undefined) {
     if (!id) return;
     try {
       setLoading(true);
-      const [detailRes, historyRes] = await Promise.all([
-        bookingService.getBookingById(id),
-        bookingService.getBookingHistory(id)
-      ]);
-      setBooking(detailRes.data);
-      setHistory(historyRes.data);
+
+      const res = await bookingService.getBookingById(id);
+
+      const roomDetailData = res.data.booking;
+      const roomHistoryData = res.data.histories;
+
+      setBooking(roomDetailData);
+      setHistory(roomHistoryData);
     } catch (err) {
       console.error("Gagal mengambil data:", err);
     } finally {
@@ -34,7 +36,7 @@ export function useAdminBooking(id: string | undefined) {
       setIsProcessing(true);
       if (action === "Approve") await bookingService.approveBooking(id);
       else await bookingService.rejectBooking(id);
-      
+
       alert(`Berhasil melakukan ${action}`);
       await fetchData();
     } catch (err: any) {
