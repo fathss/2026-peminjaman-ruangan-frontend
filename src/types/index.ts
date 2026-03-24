@@ -18,7 +18,7 @@ export interface User {
 export interface Room {
   id: number;
   name: string;
-  location: string; 
+  location: string;
   capacity: number;
   description?: string;
   isActive: boolean;
@@ -101,6 +101,8 @@ export interface BookingSummaryProps {
 export interface FormInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
+  error?: string;
+  info?: string;
 }
 
 export interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {

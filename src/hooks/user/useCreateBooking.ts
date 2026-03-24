@@ -19,6 +19,8 @@ export function useCreateBooking() {
     purpose: "",
   });
 
+  const [errors, setErrors] = useState({ startTime: "", endTime: "", purpose: "" })
+
   useEffect(() => {
     const fetchRoomDetail = async () => {
       if (!roomId) return;
@@ -46,6 +48,8 @@ export function useCreateBooking() {
       return;
     }
 
+    setErrors({ startTime: "", endTime: "", purpose: "" });
+
     setIsLoading(true);
     try {
       const payload = {
@@ -59,7 +63,29 @@ export function useCreateBooking() {
       alert("Pengajuan berhasil dikirim!");
       navigate("/bookinghistory");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Terjadi kesalahan saat memesan.");
+      const newErrors: any = {};
+
+      const validationErrors = err.response.data.errors;
+      if (validationErrors) {
+        Object.keys(validationErrors).forEach((key) => {
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+
+          let message = validationErrors[key][0];
+
+          newErrors[fieldName] = message;
+        })
+      }
+
+      const errorMessage = err.response.data.message
+      if (errorMessage) {
+        if (errorMessage.toLowerCase().includes("waktu mulai")) {
+          newErrors["startTime"] = errorMessage;
+        } else if (errorMessage.toLowerCase().includes("waktu selesai")) {
+          newErrors["endTime"] = errorMessage;
+        }
+      }
+
+      setErrors(newErrors);
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +98,7 @@ export function useCreateBooking() {
     isRoomLoading,
     handleChange,
     handleSubmit,
-    roomId
+    roomId,
+    errors
   };
 }

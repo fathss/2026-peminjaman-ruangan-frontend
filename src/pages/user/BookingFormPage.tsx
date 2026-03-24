@@ -9,13 +9,14 @@ import { parseLocation } from "../../utils/locationParser";
 
 function BookingFormPage() {
   const navigate = useNavigate();
-  const { 
-    formData, 
-    roomData, 
-    isLoading, 
-    isRoomLoading, 
-    handleChange, 
-    handleSubmit 
+  const {
+    formData,
+    roomData,
+    isLoading,
+    isRoomLoading,
+    handleChange,
+    handleSubmit,
+    errors
   } = useCreateBooking();
 
   const { building, floor } = parseLocation(roomData?.location);
@@ -48,6 +49,7 @@ function BookingFormPage() {
                   placeholder="Contoh: Rapat Koordinasi UKM Seni..."
                   rows={3}
                   value={formData.purpose}
+                  error={errors.purpose}
                   onChange={handleChange}
                   icon={<FileText size={18} />}
                   required
@@ -59,6 +61,7 @@ function BookingFormPage() {
                     name="startTime"
                     type="datetime-local"
                     value={formData.startTime}
+                    error={errors.startTime}
                     onChange={handleChange}
                     icon={<Calendar size={18} />}
                     required
@@ -68,6 +71,7 @@ function BookingFormPage() {
                     name="endTime"
                     type="datetime-local"
                     value={formData.endTime}
+                    error={errors.endTime}
                     onChange={handleChange}
                     icon={<Calendar size={18} />}
                     required
@@ -102,7 +106,7 @@ function BookingFormPage() {
               <BookingSummary
                 roomName={roomData.name}
                 building={building}
-                floor={floor}      
+                floor={floor}
                 capacity={roomData.capacity}
               />
             ) : (

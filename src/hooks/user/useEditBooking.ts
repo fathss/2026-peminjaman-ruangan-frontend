@@ -7,7 +7,7 @@ export function useEditBooking(id: string | undefined) {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     purpose: "",
     startTime: "",
@@ -20,29 +20,34 @@ export function useEditBooking(id: string | undefined) {
     capacity: 0
   });
 
+  const [errors, setErrors] = useState({ startTime: "", endTime: "", purpose: "" })
+
   useEffect(() => {
     if (!id) return;
 
     const fetchData = async () => {
       try {
         setLoading(true);
-        const { data: booking } = await bookingService.getBookingById(id);
-        
-        if (booking.status !== "Pending") {
+
+        const res = await bookingService.getBookingById(id);
+
+        const roomBooking = res.data.booking;
+
+        if (roomBooking.status !== "Pending") {
           alert("Booking yang sudah diproses tidak dapat diubah");
           navigate(-1);
           return;
         }
 
         setFormData({
-          purpose: booking.purpose,
-          startTime: booking.startTime.slice(0, 16),
-          endTime: booking.endTime.slice(0, 16),
-          roomName: booking.roomName,
+          purpose: roomBooking.purpose,
+          startTime: roomBooking.startTime.slice(0, 16),
+          endTime: roomBooking.endTime.slice(0, 16),
+          roomName: roomBooking.roomName,
         });
 
-        if (booking.roomId) {
-          const { data: room } = await getRoomById(booking.roomId);
+        if (roomBooking.roomId) {
+          const { data: room } = await getRoomById(roomBooking.roomId);
           setRoomDetails({
             location: room.location || "",
             capacity: room.capacity || 0
@@ -61,8 +66,11 @@ export function useEditBooking(id: string | undefined) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    setErrors({ startTime: "", endTime: "", purpose: "" });
+
     if (!id) return;
-    
+
     try {
       setSubmitting(true);
       const payload = {
@@ -70,12 +78,34 @@ export function useEditBooking(id: string | undefined) {
         startTime: new Date(formData.startTime).toISOString(),
         endTime: new Date(formData.endTime).toISOString()
       };
-      
+
       await bookingService.updateBooking(id, payload);
       alert("Booking berhasil diperbarui");
       navigate("/bookinghistory");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Gagal memperbarui booking");
+      const newErrors: any = {};
+
+      const validationErrors = err.response.data.errors;
+      if (validationErrors) {
+        Object.keys(validationErrors).forEach((key) => {
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+
+          let message = validationErrors[key][0];
+
+          newErrors[fieldName] = message;
+        })
+      }
+
+      const errorMessage = err.response.data.message
+      if (errorMessage) {
+        if (errorMessage.toLowerCase().includes("waktu mulai")) {
+          newErrors["startTime"] = errorMessage;
+        } else if (errorMessage.toLowerCase().includes("waktu selesai")) {
+          newErrors["endTime"] = errorMessage;
+        }
+      }
+
+      setErrors(newErrors);
     } finally {
       setSubmitting(false);
     }
@@ -86,5 +116,5 @@ export function useEditBooking(id: string | undefined) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  return { formData, roomDetails, loading, submitting, handleChange, handleSubmit };
+  return { formData, roomDetails, loading, submitting, handleChange, handleSubmit, errors };
 }

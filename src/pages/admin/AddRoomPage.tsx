@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import Navbar from "../../layouts/Navbar";
 import BackButton from "../../components/BackButton";
-import { 
-  Building2, MapPin, Users, AlignLeft, 
-  PlusCircle, Check, Loader2 
+import {
+  Building2, MapPin, Users, AlignLeft,
+  PlusCircle, Check, Loader2
 } from "lucide-react";
 import { useRoomForm } from "../../hooks/admin/useAdminRoomForm";
 
@@ -26,7 +26,7 @@ function AddRoomPage() {
       <Navbar />
 
       <main className="max-w-3xl mx-auto p-6">
-        <BackButton label="Kembali" mb="mb-4"/>
+        <BackButton label="Kembali" mb="mb-4" />
 
         <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
           <div className="bg-blue-600 p-9 text-white relative overflow-hidden">
@@ -39,10 +39,10 @@ function AddRoomPage() {
 
           <form onSubmit={handleSubmit} className="p-10 space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              
+
               <div className="md:col-span-2 space-y-2">
                 <FieldLabel icon={Building2}>Nama Ruangan</FieldLabel>
-                <input 
+                <input
                   required name="name" value={formData.name} onChange={handleChange}
                   type="text" placeholder="Contoh: HH-301 / SAW-01.01"
                   className={INPUT_CLASS}
@@ -51,7 +51,7 @@ function AddRoomPage() {
 
               <div className="space-y-2">
                 <FieldLabel icon={MapPin}>Lokasi / Gedung</FieldLabel>
-                <input 
+                <input
                   required name="location" value={formData.location} onChange={handleChange}
                   type="text" placeholder="Contoh: Gedung D4, Lt. 2"
                   className={INPUT_CLASS}
@@ -61,7 +61,7 @@ function AddRoomPage() {
               <div className="space-y-2">
                 <FieldLabel icon={Users}>Kapasitas Maksimal</FieldLabel>
                 <div className="relative">
-                  <input 
+                  <input
                     required name="capacity" value={formData.capacity} onChange={handleChange}
                     type="number" placeholder="100"
                     className={INPUT_CLASS}
@@ -72,7 +72,7 @@ function AddRoomPage() {
 
               <div className="md:col-span-2 space-y-2">
                 <FieldLabel icon={AlignLeft}>Deskripsi Ruangan</FieldLabel>
-                <textarea 
+                <textarea
                   required name="description" value={formData.description} onChange={handleChange}
                   rows={1} placeholder="Contoh: Ruang Kelas / Theater / Lab"
                   className={INPUT_CLASS}
@@ -81,7 +81,7 @@ function AddRoomPage() {
             </div>
 
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
-              <button 
+              <button
                 type="submit" disabled={loading}
                 className={BTN_PRIMARY}
               >
@@ -91,7 +91,7 @@ function AddRoomPage() {
                   <>Simpan Ruangan <Check size={18} /></>
                 )}
               </button>
-              <button 
+              <button
                 type="button" onClick={() => navigate("/rooms")}
                 className={BTN_SECONDARY}
               >

@@ -10,12 +10,14 @@ function LoginCard({ title, description }: AuthProps) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({ username: "", password: "" });
 
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true); 
+    setIsLoading(true);
+    setErrors({ username: "", password: "" });
 
     try {
       const response = await axios.post("/auth/login", {
@@ -34,10 +36,17 @@ function LoginCard({ title, description }: AuthProps) {
         navigate("/dashboard");
       }
     } catch (err: any) {
-      console.log("Detail Error:", err.response?.data);
-      alert(err.response?.data?.message || "Username atau password salah!");
+      const errorMessage = err.response?.data?.message || "Username atau password salah!";
+
+      if (errorMessage.toLowerCase().includes("username")) {
+        setErrors({ username: errorMessage, password: "" });
+      } else if (errorMessage.toLowerCase().includes("password")) {
+        setErrors({ username: "", password: errorMessage });
+      } else {
+        setErrors({ username: errorMessage, password: errorMessage });
+      }
     } finally {
-      setIsLoading(false); 
+      setIsLoading(false);
     }
   };
 
@@ -60,9 +69,10 @@ function LoginCard({ title, description }: AuthProps) {
             name="username"
             value={username}
             placeholder="Student Name"
+            error={errors.username}
             onChange={(e) => setUsername(e.target.value)}
             required
-            disabled={isLoading} 
+            disabled={isLoading}
           />
 
           <FormInput
@@ -72,17 +82,18 @@ function LoginCard({ title, description }: AuthProps) {
             name="password"
             value={password}
             placeholder="********"
+            error={errors.password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            disabled={isLoading} 
+            disabled={isLoading}
           />
 
           <button
             type="submit"
             disabled={isLoading}
             className={`flex items-center justify-center gap-2 p-2 rounded transition font-bold text-white 
-              ${isLoading 
-                ? "bg-blue-400 cursor-not-allowed" 
+              ${isLoading
+                ? "bg-blue-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 active:scale-95"}`}
           >
             {isLoading ? (
