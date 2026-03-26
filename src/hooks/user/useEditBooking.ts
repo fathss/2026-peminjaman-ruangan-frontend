@@ -2,9 +2,11 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import * as bookingService from "../../services/bookingService";
 import { getRoomById } from "../../services/roomService";
+import { useToast } from "../../context/ToastContext";
 
 export function useEditBooking(id: string | undefined) {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
 
@@ -34,7 +36,11 @@ export function useEditBooking(id: string | undefined) {
         const roomBooking = res.data.booking;
 
         if (roomBooking.status !== "Pending") {
-          alert("Booking yang sudah diproses tidak dapat diubah");
+          showToast({
+            type: "warning",
+            message: "Akses Terbatas",
+            description: "Peminjaman yang sudah diproses (Disetujui/Ditolak) tidak dapat diubah kembali."
+          });
           navigate(-1);
           return;
         }
@@ -62,7 +68,7 @@ export function useEditBooking(id: string | undefined) {
     };
 
     fetchData();
-  }, [id, navigate]);
+  }, [id, navigate, showToast]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -80,12 +86,16 @@ export function useEditBooking(id: string | undefined) {
       };
 
       await bookingService.updateBooking(id, payload);
-      alert("Booking berhasil diperbarui");
+      showToast({
+        type: "success",
+        message: "Update Berhasil",
+        description: "Perubahan pada peminjaman ruangan Anda telah berhasil disimpan."
+      });
       navigate("/bookinghistory");
     } catch (err: any) {
       const newErrors: any = {};
 
-      const validationErrors = err.response.data.errors;
+      const validationErrors = err.response?.data?.errors;
       if (validationErrors) {
         Object.keys(validationErrors).forEach((key) => {
           const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
@@ -96,7 +106,7 @@ export function useEditBooking(id: string | undefined) {
         })
       }
 
-      const errorMessage = err.response.data.message
+      const errorMessage = err.response?.data?.message
       if (errorMessage) {
         if (errorMessage.toLowerCase().includes("waktu mulai")) {
           newErrors["startTime"] = errorMessage;

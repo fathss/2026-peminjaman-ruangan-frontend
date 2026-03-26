@@ -3,9 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import * as bookingService from "../../services/bookingService";
 import { getRoomById } from "../../services/roomService";
 import type { Room } from "../../types/index";
+import { useToast } from "../../context/ToastContext";
 
 export function useCreateBooking() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId");
 
@@ -60,12 +62,16 @@ export function useCreateBooking() {
       };
 
       await bookingService.createBooking(payload);
-      alert("Pengajuan berhasil dikirim!");
+      showToast({
+        type: "success",
+        message: "Pengajuan Berhasil",
+        description: "Permintaan peminjaman ruangan Anda telah berhasil dikirim dan sedang menunggu persetujuan admin."
+      });
       navigate("/bookinghistory");
     } catch (err: any) {
       const newErrors: any = {};
 
-      const validationErrors = err.response.data.errors;
+      const validationErrors = err.response?.data?.errors;
       if (validationErrors) {
         Object.keys(validationErrors).forEach((key) => {
           const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
@@ -76,7 +82,7 @@ export function useCreateBooking() {
         })
       }
 
-      const errorMessage = err.response.data.message
+      const errorMessage = err.response?.data?.message
       if (errorMessage) {
         if (errorMessage.toLowerCase().includes("waktu mulai")) {
           newErrors["startTime"] = errorMessage;

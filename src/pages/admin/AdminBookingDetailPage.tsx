@@ -1,11 +1,14 @@
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import Navbar from "../../layouts/Navbar";
 import BackButton from "../../components/BackButton";
-import { 
-  CheckCircle2, XCircle, Calendar, Clock, MapPin, 
-  FileText, ShieldCheck, Mail, Loader2, Activity, ChevronRight 
+import Modal from "../../components/Modal";
+import {
+  CheckCircle2, XCircle, Calendar, Clock, MapPin,
+  FileText, ShieldCheck, Mail, Loader2, Activity, ChevronRight,
+  AlertCircle
 } from "lucide-react";
-import { useAdminBooking } from "../../hooks/admin/useAdminBooking";
+import { useAdminBooking } from "../../hooks/admin/useAdminBookingDetail";
 import { formatFullDateTime } from "../../utils/dateFormatter";
 
 const LABEL_CLASS = "text-[10px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2";
@@ -14,6 +17,28 @@ const INFO_VALUE = "text-sm font-bold text-gray-800";
 function AdminBookingDetailPage() {
   const { id } = useParams();
   const { booking, history, loading, isProcessing, handleUpdateStatus } = useAdminBooking(id);
+  const [modalConfig, setModalConfig] = useState<{ isOpen: boolean; action: "Approve" | "Reject" | null }>({
+    isOpen: false,
+    action: null
+  });
+
+  const openModal = (action: "Approve" | "Reject") => {
+    setModalConfig({ isOpen: true, action });
+  };
+
+  const closeModal = () => {
+    if (!isProcessing) {
+      setModalConfig({ ...modalConfig, isOpen: false });
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!modalConfig.action) return;
+    const success = await handleUpdateStatus(modalConfig.action);
+    if (success) {
+      setModalConfig({ isOpen: false, action: null });
+    }
+  };
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -22,6 +47,8 @@ function AdminBookingDetailPage() {
   );
 
   if (!booking) return <div className="p-10 text-center">Data booking tidak ditemukan</div>;
+
+  const isApprove = modalConfig.action === "Approve";
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -66,24 +93,28 @@ function AdminBookingDetailPage() {
             <div className="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 p-8 space-y-6">
               <h4 className={LABEL_CLASS}><Activity size={16} /> Riwayat Perubahan Status</h4>
               <div className="space-y-4">
-                {history.map((log, idx) => (
-                  <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-2">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <span className="text-gray-400 line-through">{log.oldStatus}</span>
-                        <ChevronRight size={12} className="text-gray-400" />
-                        <span className={`font-bold ${log.newStatus === 'Approved' ? 'text-green-600' : 'text-blue-600'}`}>
-                          {log.newStatus}
-                        </span>
+                {history.length > 0 ? (
+                  history.map((log, idx) => (
+                    <div key={idx} className="bg-gray-50 p-4 rounded-xl border border-gray-100 space-y-2">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <span className="text-gray-400 line-through">{log.oldStatus}</span>
+                          <ChevronRight size={12} className="text-gray-400" />
+                          <span className={`font-bold ${log.newStatus === 'Approved' ? 'text-green-600' : 'text-blue-600'}`}>
+                            {log.newStatus}
+                          </span>
+                        </div>
+                        <span className="text-gray-400 font-mono">{formatFullDateTime(log.changedAt)}</span>
                       </div>
-                      <span className="text-gray-400 font-mono">{formatFullDateTime(log.changedAt)}</span>
+                      <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50">
+                        <ShieldCheck size={12} className="text-blue-500" />
+                        <p className="text-[10px] text-gray-500 italic">Oleh: <span className="font-bold text-gray-700">{log.changedBy || "System"}</span></p>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50">
-                      <ShieldCheck size={12} className="text-blue-500" />
-                      <p className="text-[10px] text-gray-500 italic">Oleh: <span className="font-bold text-gray-700">{log.changedBy || "System"}</span></p>
-                    </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-400 pl-6">Belum ada riwayat perubahan status.</p>
+                )}
               </div>
             </div>
           </div>
@@ -109,19 +140,19 @@ function AdminBookingDetailPage() {
               <h4 className="text-xs font-black uppercase tracking-widest text-gray-400">Keputusan Admin</h4>
               {booking.status === "Pending" ? (
                 <div className="space-y-3">
-                  <button 
-                    disabled={isProcessing} 
-                    onClick={() => handleUpdateStatus("Approve")}
+                  <button
+                    disabled={isProcessing}
+                    onClick={() => openModal("Approve")}
                     className="w-full flex items-center justify-center gap-2 bg-green-600 text-white py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-green-700 transition-all disabled:opacity-50"
                   >
-                    {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <CheckCircle2 size={16} />} Setujui
+                    <CheckCircle2 size={16} /> Setujui
                   </button>
-                  <button 
-                    disabled={isProcessing} 
-                    onClick={() => handleUpdateStatus("Reject")}
+                  <button
+                    disabled={isProcessing}
+                    onClick={() => openModal("Reject")}
                     className="w-full flex items-center justify-center gap-2 bg-white text-red-600 border border-red-100 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-red-50 transition-all disabled:opacity-50"
                   >
-                    {isProcessing ? <Loader2 className="animate-spin" size={16} /> : <XCircle size={16} />} Tolak
+                    <XCircle size={16} /> Tolak
                   </button>
                 </div>
               ) : (
@@ -134,6 +165,49 @@ function AdminBookingDetailPage() {
           </div>
         </div>
       </main>
+
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={closeModal}
+        title={isApprove ? "Setujui Peminjaman" : "Tolak Peminjaman"}
+        footer={
+          <div className="flex gap-3">
+            <button
+              disabled={isProcessing}
+              onClick={closeModal}
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              disabled={isProcessing}
+              onClick={handleConfirmAction}
+              className={`px-6 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 disabled:opacity-50
+                ${isApprove ? 'bg-green-600 hover:bg-green-700 shadow-green-100' : 'bg-red-600 hover:bg-red-700 shadow-red-100'}`}
+            >
+              {isProcessing ? (
+                <>Memproses... <Loader2 className="animate-spin" size={16} /></>
+              ) : (
+                <>{isApprove ? 'Setujui' : 'Tolak'}</>
+              )}
+            </button>
+          </div>
+        }
+      >
+        <div className="flex items-center gap-4 text-gray-600">
+          <div className={`p-4 rounded-2xl ${isApprove ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
+            <AlertCircle size={32} />
+          </div>
+          <div>
+            <p className="font-bold text-gray-900">
+              Apakah Anda yakin ingin {isApprove ? 'menyetujui' : 'menolak'} peminjaman ini?
+            </p>
+            <p className="text-sm">
+              Tindakan ini akan memperbarui status peminjaman untuk ruangan <span className="font-bold text-gray-800">{booking.roomName}</span>.
+            </p>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

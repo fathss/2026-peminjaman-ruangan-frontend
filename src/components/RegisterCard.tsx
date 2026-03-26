@@ -4,8 +4,10 @@ import axios from "../api/axios";
 import FormInput from "./FormInput";
 import { Loader2 } from "lucide-react";
 import type { AuthProps } from "../types";
+import { useToast } from "../context/ToastContext";
 
 function RegisterCard({ title, description }: AuthProps) {
+  const { showToast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -20,14 +22,17 @@ function RegisterCard({ title, description }: AuthProps) {
     setErrors({ username: "", email: "" });
 
     try {
-      const response = await axios.post("/auth/register", {
+      await axios.post("/auth/register", {
         username,
         email,
         password,
       });
 
-      // TODO: Buat modal atau toast
-      alert("Registrasi berhasil! Silakan login.");
+      showToast({
+        type: "success",
+        message: "Registrasi Berhasil!",
+        description: "Akun Anda telah dibuat. Silakan login untuk melanjutkan."
+      });
 
       navigate("/login");
     } catch (err: any) {

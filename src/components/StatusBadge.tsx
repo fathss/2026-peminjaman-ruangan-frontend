@@ -1,35 +1,22 @@
-import type { StatusBadgeProps } from "../types";
+import { getStatusStyle, getStatusIcon } from "../utils/statusHelpers";
+import type { StatusBadgeProps, BookingStatus } from "../types";
 
 function StatusBadge({ status, variant = 'badge' }: StatusBadgeProps) {
-  const getStatusStyle = (status: string) => {
-    switch (status) {
-      case 'Approved':
-        return 'bg-green-100 text-green-700 border-green-100';
-      case 'Pending':
-        return 'bg-orange-100 text-orange-700 border-orange-100';
-      case 'Rejected':
-        return 'bg-red-100 text-red-700 border-red-100';
-      case 'OnGoing':
-        return 'bg-blue-100 text-blue-700 border-blue-100';
-      case 'Completed':
-        return 'bg-indigo-100 text-indigo-700 border-indigo-100';
-      case 'Cancelled':
-        return 'bg-gray-100 text-gray-700 border-gray-100';
-    }
-  };
-
-  const styleClass = getStatusStyle(status);
+  const styleClass = getStatusStyle(status as BookingStatus);
+  const icon = getStatusIcon(status as BookingStatus);
 
   if (variant === 'label') {
     return (
-      <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border ${styleClass}`}>
+      <span className={`px-3 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-wider border inline-flex items-center gap-1.5 ${styleClass}`}>
+        {icon}
         {status}
       </span>
     );
   }
 
   return (
-    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${styleClass}`}>
+    <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border inline-flex items-center gap-2 ${styleClass}`}>
+      {icon}
       {status}
     </span>
   );

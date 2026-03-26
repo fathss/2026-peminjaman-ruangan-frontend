@@ -1,17 +1,21 @@
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import Navbar from "../../layouts/Navbar";
-import { 
-  ArrowLeft, 
+import Modal from "../../components/Modal";
+import {
+  ArrowLeft,
   Edit3,
-  Calendar, 
-  Clock, 
-  User, 
+  Calendar,
+  Clock,
+  User,
   FileText,
   Activity,
   Info,
   Loader2,
   XCircle,
-  ChevronRight
+  ChevronRight,
+  AlertTriangle,
+  CheckCircle2
 } from "lucide-react";
 import InfoItem from "../../components/InfoItem";
 import { STATUS_CONFIG } from "../../constants/bookingDetailStatus";
@@ -26,6 +30,39 @@ function BookingDetailPage() {
   const { booking, history, loading, progress } = useBookingDetail(id);
   const { handleCancel, handleComplete, isProcessing } = useBookingActions(id);
 
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    action: "Cancel" | "Complete" | null;
+  }>({
+    isOpen: false,
+    action: null
+  });
+
+  const openModal = (action: "Cancel" | "Complete") => {
+    setModalConfig({ isOpen: true, action });
+  };
+
+  const closeModal = () => {
+    if (!isProcessing) {
+      setModalConfig({ ...modalConfig, isOpen: false });
+    }
+  };
+
+  const handleConfirmAction = async () => {
+    if (!modalConfig.action) return;
+
+    let success = false;
+    if (modalConfig.action === "Cancel") {
+      success = await handleCancel();
+    } else {
+      success = await handleComplete();
+    }
+
+    if (success) {
+      setModalConfig({ isOpen: false, action: null });
+    }
+  };
+
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">
       <Loader2 className="animate-spin text-blue-600" size={40} />
@@ -36,6 +73,7 @@ function BookingDetailPage() {
 
   const currentStatus = STATUS_CONFIG[booking.status] || STATUS_CONFIG.Pending;
   const StatusIcon = currentStatus.icon;
+  const isCancelAction = modalConfig.action === "Cancel";
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -45,16 +83,16 @@ function BookingDetailPage() {
         {/* Navigasi Atas */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <button 
-              onClick={() => navigate(-1)} 
+            <button
+              onClick={() => navigate(-1)}
               className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-blue-600 transition-colors"
             >
               <ArrowLeft size={18} /> Kembali
             </button>
 
             {booking.status === "Pending" && userRole === "User" && (
-              <button 
-                onClick={() => navigate(`/roombookings/edit/${id}`)} 
+              <button
+                onClick={() => navigate(`/roombookings/edit/${id}`)}
                 className="flex items-center gap-2 text-sm font-bold text-amber-600 hover:text-amber-700 transition-colors bg-amber-50 px-3 py-1 rounded-lg border border-amber-100"
               >
                 <Edit3 size={16} /> Edit Booking
@@ -101,10 +139,10 @@ function BookingDetailPage() {
             <hr className="border-gray-50" />
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <InfoItem icon={<User size={12}/>} label="Peminjam" value={booking.userName} />
-              <InfoItem icon={<FileText size={12}/>} label="Tujuan Kegiatan" value={booking.purpose} />
-              <InfoItem icon={<Calendar size={12}/>} label="Waktu Mulai" value={formatFullDateTime(booking.startTime)} />
-              <InfoItem icon={<Clock size={12}/>} label="Waktu Selesai" value={formatFullDateTime(booking.endTime)} />
+              <InfoItem icon={<User size={12} />} label="Peminjam" value={booking.userName} />
+              <InfoItem icon={<FileText size={12} />} label="Tujuan Kegiatan" value={booking.purpose} />
+              <InfoItem icon={<Calendar size={12} />} label="Waktu Mulai" value={formatFullDateTime(booking.startTime)} />
+              <InfoItem icon={<Clock size={12} />} label="Waktu Selesai" value={formatFullDateTime(booking.endTime)} />
             </div>
 
             {booking.status === "OnGoing" && (
@@ -168,36 +206,72 @@ function BookingDetailPage() {
         {/* Footer Action */}
         <div className="flex flex-col items-center gap-6 py-8 border-t border-gray-100 mt-8">
           {(booking.status === "Pending" || booking.status === "Approved") && (
-            <button 
-              onClick={handleCancel}
+            <button
+              onClick={() => openModal("Cancel")}
               disabled={isProcessing}
               className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
             >
-              {isProcessing ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : (
-                <XCircle size={14} />
-              )}
+              <XCircle size={14} />
               Batalkan Peminjaman
             </button>
           )}
 
           {booking.status === "OnGoing" && (
-            <button 
-                onClick={handleComplete}
-                disabled={isProcessing}
-                className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-red-500 hover:text-red-700 transition-colors disabled:opacity-50"
-              >
-                {isProcessing ? (
-                  <Loader2 size={14} className="animate-spin" />
-                ) : (
-                  <XCircle size={14} />
-                )}
+            <button
+              onClick={() => openModal("Complete")}
+              disabled={isProcessing}
+              className="flex items-center gap-2 text-xs font-black uppercase tracking-[0.2em] text-blue-600 hover:text-blue-700 transition-colors disabled:opacity-50"
+            >
+              <CheckCircle2 size={14} />
               Selesaikan Peminjaman Lebih Awal
             </button>
           )}
         </div>
       </main>
+
+      {/* Modal Konfirmasi */}
+      <Modal
+        isOpen={modalConfig.isOpen}
+        onClose={closeModal}
+        title={isCancelAction ? "Batalkan Peminjaman" : "Selesaikan Peminjaman"}
+        footer={
+          <div className="flex gap-3">
+            <button
+              disabled={isProcessing}
+              onClick={closeModal}
+              className="px-6 py-3 bg-white border border-gray-200 text-gray-400 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-50 transition-all disabled:opacity-50"
+            >
+              Batal
+            </button>
+            <button
+              disabled={isProcessing}
+              onClick={handleConfirmAction}
+              className={`px-6 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 disabled:opacity-50
+                ${isCancelAction ? 'bg-red-600 hover:bg-red-700 shadow-red-100' : 'bg-blue-600 hover:bg-blue-700 shadow-blue-100'}`}
+            >
+              {isProcessing ? (
+                <>Memproses... <Loader2 className="animate-spin" size={16} /></>
+              ) : (
+                <>Konfirmasi {isCancelAction ? 'Batalkan' : 'Selesaikan'}</>
+              )}
+            </button>
+          </div>
+        }
+      >
+        <div className="flex items-center gap-4 text-gray-600">
+          <div className={`p-4 rounded-2xl ${isCancelAction ? 'bg-red-50 text-red-600' : 'bg-blue-50 text-blue-600'}`}>
+            {isCancelAction ? <AlertTriangle size={32} /> : <CheckCircle2 size={32} />}
+          </div>
+          <div>
+            <p className="font-bold text-gray-900">
+              Apakah Anda yakin ingin {isCancelAction ? 'membatalkan' : 'menyelesaikan'} peminjaman ini?
+            </p>
+            <p className="text-sm">
+              Tindakan ini akan mengubah status peminjaman untuk ruangan <span className="font-bold text-gray-800">{booking.roomName}</span>.
+            </p>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
