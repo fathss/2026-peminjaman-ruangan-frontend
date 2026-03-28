@@ -1,4 +1,21 @@
 # Changelog
+
+## [1.2.0] - 2026-03-28
+
+### Added
+- Menambahkan sistem notifikasi global menggunakan `ToastContext` dan komponen `Toast` yang fleksibel.
+- Menambahkan komponen `Modal` yang dapat digunakan ulang untuk interaksi pengguna yang lebih kaya.
+- Menambahkan properti baru dan penanganan tipe TypeScript untuk komponen UI.
+
+### Changed
+- Merefaktor besar-besaran komponen UI (`RoomCard`, `StatusBadge`, `BackButton`, dll.) untuk meningkatkan estetika dan pengalaman pengguna.
+- Memperbarui alur manajemen ruangan di admin (`AddRoomPage`, `EditRoomPage`) dengan validasi input yang lebih baik.
+- Merefaktor halaman detail pemesanan admin dan pengguna untuk tampilan informasi yang lebih komprehensif.
+- Mengintegrasikan penanganan error yang lebih informatif pada hook API (`useBookingActions`, `useCreateBooking`, `useEditBooking`).
+
+### Fixed
+- Memperbaiki penanganan state dan validasi pada formulir pemesanan dan manajemen ruangan.
+
 ## [1.1.0] - 2026-03-07
 
 ### Added
