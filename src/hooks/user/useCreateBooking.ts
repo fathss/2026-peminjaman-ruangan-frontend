@@ -3,9 +3,11 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import * as bookingService from "../../services/bookingService";
 import { getRoomById } from "../../services/roomService";
 import type { Room } from "../../types/index";
+import { useToast } from "../../context/ToastContext";
 
 export function useCreateBooking() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
   const [searchParams] = useSearchParams();
   const roomId = searchParams.get("roomId");
 
@@ -18,6 +20,8 @@ export function useCreateBooking() {
     endTime: "",
     purpose: "",
   });
+
+  const [errors, setErrors] = useState({ startTime: "", endTime: "", purpose: "" })
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -46,6 +50,8 @@ export function useCreateBooking() {
       return;
     }
 
+    setErrors({ startTime: "", endTime: "", purpose: "" });
+
     setIsLoading(true);
     try {
       const payload = {
@@ -56,10 +62,36 @@ export function useCreateBooking() {
       };
 
       await bookingService.createBooking(payload);
-      alert("Pengajuan berhasil dikirim!");
+      showToast({
+        type: "success",
+        message: "Pengajuan Berhasil",
+        description: "Permintaan peminjaman ruangan Anda telah berhasil dikirim dan sedang menunggu persetujuan admin."
+      });
       navigate("/bookinghistory");
     } catch (err: any) {
-      alert(err.response?.data?.message || "Terjadi kesalahan saat memesan.");
+      const newErrors: any = {};
+
+      const validationErrors = err.response?.data?.errors;
+      if (validationErrors) {
+        Object.keys(validationErrors).forEach((key) => {
+          const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
+
+          let message = validationErrors[key][0];
+
+          newErrors[fieldName] = message;
+        })
+      }
+
+      const errorMessage = err.response?.data?.message
+      if (errorMessage) {
+        if (errorMessage.toLowerCase().includes("waktu mulai")) {
+          newErrors["startTime"] = errorMessage;
+        } else if (errorMessage.toLowerCase().includes("waktu selesai")) {
+          newErrors["endTime"] = errorMessage;
+        }
+      }
+
+      setErrors(newErrors);
     } finally {
       setIsLoading(false);
     }
@@ -72,6 +104,7 @@ export function useCreateBooking() {
     isRoomLoading,
     handleChange,
     handleSubmit,
-    roomId
+    roomId,
+    errors
   };
 }

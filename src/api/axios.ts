@@ -29,7 +29,13 @@ axiosInstance.interceptors.response.use(
   (error) => {
     if (error.response && error.response.status === 401) {
       localStorage.removeItem("token");
-      window.location.href = "/login";
+
+      const authPaths = ["/login", "/register", "/"];
+      const isAuthPage = authPaths.includes(window.location.pathname);
+
+      if (!isAuthPage) {
+        window.location.href = "/login";
+      }
     }
     return Promise.reject(error);
   }

@@ -8,12 +8,13 @@ import { useRooms } from "../../hooks/shared/useRooms";
 
 function RoomPage() {
   const navigate = useNavigate();
-  const { 
-    rooms, 
-    filteredRooms, 
-    loading, 
-    setSearchQuery, 
-    setBuildingFilter 
+  const {
+    rooms,
+    filteredRooms,
+    loading,
+    setSearchQuery,
+    setBuildingFilter,
+    refreshRooms
   } = useRooms();
 
   const isAdmin = localStorage.getItem("role") === "Admin";
@@ -21,28 +22,28 @@ function RoomPage() {
   return (
     <div className="min-h-screen bg-gray-50/50">
       <Navbar />
-      
+
       <main className="max-w-7xl mx-auto p-6">
         {/* Header Section */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
           <div>
-            <BackButton 
-              to={isAdmin ? "/admin/dashboard" : "/dashboard"} 
-              label="Kembali ke Dashboard" 
+            <BackButton
+              to={isAdmin ? "/admin/dashboard" : "/dashboard"}
+              label="Kembali ke Dashboard"
             />
             <h2 className="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3 mt-4">
-              <School className="text-blue-600" size={32} /> 
+              <School className="text-blue-600" size={32} />
               {isAdmin ? "Manajemen Ruangan" : "Jelajahi Ruangan Kampus"}
             </h2>
             <p className="text-gray-500 font-medium text-sm mt-1">
-              {isAdmin 
-                ? "Tambahkan, edit, atau nonaktifkan ruangan yang tersedia di sistem." 
+              {isAdmin
+                ? "Tambahkan, edit, atau nonaktifkan ruangan yang tersedia di sistem."
                 : "Pilih ruangan yang sesuai dengan kebutuhan kegiatan Anda."}
             </p>
           </div>
 
           {isAdmin && (
-            <button 
+            <button
               onClick={() => navigate("/admin/rooms/add")}
               className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 transition-all active:scale-95"
             >
@@ -54,11 +55,11 @@ function RoomPage() {
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Sidebar: Filters & Stats */}
           <aside className="lg:col-span-1 space-y-6">
-            <FilterPanel 
-              onSearch={setSearchQuery} 
-              onFilterBuilding={setBuildingFilter} 
+            <FilterPanel
+              onSearch={setSearchQuery}
+              onFilterBuilding={setBuildingFilter}
             />
-            
+
             {isAdmin && <AdminQuickStats count={rooms.length} />}
           </aside>
 
@@ -69,10 +70,11 @@ function RoomPage() {
             ) : filteredRooms.length > 0 ? (
               <div className="grid grid-cols-1 gap-4">
                 {filteredRooms.map((room) => (
-                  <RoomCard 
-                    key={room.id} 
-                    room={room} 
-                    isAdmin={isAdmin} 
+                  <RoomCard
+                    key={room.id}
+                    room={room}
+                    isAdmin={isAdmin}
+                    onRefresh={refreshRooms}
                   />
                 ))}
               </div>
@@ -91,7 +93,7 @@ function AdminQuickStats({ count }: { count: number }) {
     <div className="p-6 bg-blue-900 rounded-[2rem] text-white shadow-xl shadow-blue-900/10">
       <div className="flex items-center gap-3 mb-4 opacity-70">
         <LayoutDashboard size={18} />
-        <span className="text-[10px] font-black uppercase tracking-widest">Status Inventaris</span>
+        <span className="text-[10px] font-black uppercase tracking-widest">Status Ruangan</span>
       </div>
       <div className="space-y-1">
         <p className="text-3xl font-black">{count}</p>

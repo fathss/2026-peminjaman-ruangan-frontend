@@ -1,8 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import * as bookingService from "../../services/bookingService";
 import type { Booking, StatusHistory } from "../../types";
+import { useToast } from "../../context/ToastContext";
 
 export function useAdminBooking(id: string | undefined) {
+  const { showToast } = useToast();
   const [booking, setBooking] = useState<Booking>();
   const [history, setHistory] = useState<StatusHistory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -28,19 +30,28 @@ export function useAdminBooking(id: string | undefined) {
   }, [id]);
 
   const handleUpdateStatus = async (action: "Approve" | "Reject") => {
-    if (!id) return;
-    const confirmMsg = action === "Approve" ? "Setujui peminjaman ini?" : "Tolak peminjaman ini?";
-    if (!window.confirm(confirmMsg)) return;
+    if (!id) return false;
 
     try {
       setIsProcessing(true);
       if (action === "Approve") await bookingService.approveBooking(id);
       else await bookingService.rejectBooking(id);
 
-      alert(`Berhasil melakukan ${action}`);
+      showToast({
+        type: "success",
+        message: action === "Approve" ? "Peminjaman Disetujui" : "Peminjaman Ditolak",
+        description: `Status peminjaman berhasil diperbarui menjadi ${action === "Approve" ? "Approved" : "Rejected"}.`
+      });
+
       await fetchData();
+      return true;
     } catch (err: any) {
-      alert(err.response?.data?.message || "Gagal memperbarui status");
+      showToast({
+        type: "danger",
+        message: "Gagal Memperbarui",
+        description: err.response?.data?.message || "Terjadi kesalahan saat memperbarui status."
+      });
+      return false;
     } finally {
       setIsProcessing(false);
     }

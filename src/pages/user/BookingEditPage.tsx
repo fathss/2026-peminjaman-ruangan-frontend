@@ -9,7 +9,7 @@ import { useEditBooking } from "../../hooks/user/useEditBooking";
 function BookingEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { formData, roomDetails, loading, submitting, handleChange, handleSubmit } = useEditBooking(id);
+  const { formData, roomDetails, loading, submitting, handleChange, handleSubmit, errors } = useEditBooking(id);
 
   const parseLocation = (location: string) => {
     if (!location) return { building: "-", floor: "-" };
@@ -59,6 +59,7 @@ function BookingEditPage() {
                   rows={3}
                   value={formData.purpose}
                   onChange={handleChange}
+                  error={errors.purpose}
                   icon={<FileText size={18} />}
                   required
                 />
@@ -70,6 +71,7 @@ function BookingEditPage() {
                     type="datetime-local"
                     value={formData.startTime}
                     onChange={handleChange}
+                    error={errors.startTime}
                     icon={<Calendar size={18} />}
                     required
                   />
@@ -79,6 +81,7 @@ function BookingEditPage() {
                     type="datetime-local"
                     value={formData.endTime}
                     onChange={handleChange}
+                    error={errors.endTime}
                     icon={<Calendar size={18} />}
                     required
                   />

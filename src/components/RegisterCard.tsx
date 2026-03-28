@@ -4,33 +4,47 @@ import axios from "../api/axios";
 import FormInput from "./FormInput";
 import { Loader2 } from "lucide-react";
 import type { AuthProps } from "../types";
+import { useToast } from "../context/ToastContext";
 
 function RegisterCard({ title, description }: AuthProps) {
+  const { showToast } = useToast();
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [errors, setErrors] = useState({ username: "", email: "" });
 
   const navigate = useNavigate();
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setIsLoading(true);
+    setErrors({ username: "", email: "" });
 
     try {
-      const response = await axios.post("/auth/register", {
+      await axios.post("/auth/register", {
         username,
         email,
         password,
       });
 
-      console.log("Registration Success:", response.data);
-      alert("Registrasi berhasil! Silakan login.");
+      showToast({
+        type: "success",
+        message: "Registrasi Berhasil!",
+        description: "Akun Anda telah dibuat. Silakan login untuk melanjutkan."
+      });
 
       navigate("/login");
     } catch (err: any) {
-      console.error("Registration Error:", err.response?.data);
-      alert(err.response?.data?.message || "Registrasi gagal. Username atau Email mungkin sudah digunakan.");
+      const errorMessage = err.response?.data?.message || "Registrasi gagal!";
+
+      if (errorMessage.toLowerCase().includes("username")) {
+        setErrors({ ...errors, username: errorMessage });
+      } else if (errorMessage.toLowerCase().includes("email")) {
+        setErrors({ ...errors, email: errorMessage });
+      } else {
+        setErrors({ username: errorMessage, email: errorMessage });
+      }
     } finally {
       setIsLoading(false);
     }
@@ -55,6 +69,7 @@ function RegisterCard({ title, description }: AuthProps) {
             name="username"
             value={username}
             placeholder="user"
+            error={errors.username}
             onChange={(e) => setUsername(e.target.value)}
             required
             disabled={isLoading}
@@ -67,6 +82,7 @@ function RegisterCard({ title, description }: AuthProps) {
             name="email"
             value={email}
             placeholder="example@email.com"
+            error={errors.email}
             onChange={(e) => setEmail(e.target.value)}
             required
             disabled={isLoading}
@@ -79,6 +95,7 @@ function RegisterCard({ title, description }: AuthProps) {
             name="password"
             value={password}
             placeholder="********"
+            info="Minimal 6 karakter"
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
@@ -89,8 +106,8 @@ function RegisterCard({ title, description }: AuthProps) {
             type="submit"
             disabled={isLoading}
             className={`flex items-center justify-center gap-2 p-2 rounded transition font-bold text-white 
-              ${isLoading 
-                ? "bg-blue-400 cursor-not-allowed" 
+              ${isLoading
+                ? "bg-blue-400 cursor-not-allowed"
                 : "bg-blue-600 hover:bg-blue-700 active:scale-95"}`}
           >
             {isLoading ? (

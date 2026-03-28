@@ -1,34 +1,56 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import * as bookingService from "../../services/bookingService";
+import { useToast } from "../../context/ToastContext";
 
 export function useBookingActions(id: string | undefined) {
+  const { showToast } = useToast();
   const [isProcessing, setIsProcessing] = useState(false);
   const navigate = useNavigate();
 
   const handleCancel = async () => {
-    if (!window.confirm("Apakah Anda yakin ingin membatalkan peminjaman ini?")) return;
+    if (!id) return false;
     try {
       setIsProcessing(true);
-      await bookingService.cancelBooking(id!);
-      alert("Booking berhasil dibatalkan");
+      await bookingService.cancelBooking(id);
+      showToast({
+        type: "success",
+        message: "Booking Dibatalkan",
+        description: "Peminjaman ruangan Anda telah berhasil dibatalkan."
+      });
       navigate("/bookinghistory");
+      return true;
     } catch (err: any) {
-      alert(err.response?.data?.message || "Gagal membatalkan");
+      showToast({
+        type: "danger",
+        message: "Gagal Membatalkan",
+        description: err.response?.data?.message || "Terjadi kesalahan saat membatalkan booking."
+      });
+      return false;
     } finally {
       setIsProcessing(false);
     }
   };
 
   const handleComplete = async () => {
-    if (!window.confirm("Apakah Anda yakin ingin menyelesaikan peminjaman ini?")) return;
+    if (!id) return false;
     try {
       setIsProcessing(true);
-      await bookingService.completeBooking(id!);
-      alert("Booking berhasil diselesaikan");
+      await bookingService.completeBooking(id);
+      showToast({
+        type: "success",
+        message: "Booking Selesai",
+        description: "Peminjaman ruangan telah ditandai sebagai selesai."
+      });
       navigate("/bookinghistory");
+      return true;
     } catch (err: any) {
-      alert(err.response?.data?.message || "Gagal menyelesaikan");
+      showToast({
+        type: "danger",
+        message: "Gagal Menyelesaikan",
+        description: err.response?.data?.message || "Terjadi kesalahan saat menyelesaikan booking."
+      });
+      return false;
     } finally {
       setIsProcessing(false);
     }

@@ -53,7 +53,7 @@ function AdminDashboard() {
                   <th className="px-6 py-4">Ruangan</th>
                   <th className="px-6 py-4">Tanggal</th>
                   <th className="px-6 py-4">Status</th>
-                  <th className="px-6 py-4 text-right">Aksi</th> 
+                  <th className="px-6 py-4 text-right">Aksi</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
@@ -66,18 +66,18 @@ function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 text-gray-600 text-sm font-semibold">{booking.roomName}</td>
                       <td className="px-6 py-4 text-gray-500 text-sm">
-                        {formatFullDateTime(booking.startTime).split(',')[0]} 
+                        {formatFullDateTime(booking.startTime).split(',')[0]}
                       </td>
                       <td className="px-6 py-4">
                         <StatusBadge status={booking.status} />
                       </td>
                       {/* Tombol Aksi Detail */}
                       <td className="px-6 py-4 text-right">
-                        <Link 
-                          to={`/admin/roombookings/detail/${booking.id}`} 
+                        <Link
+                          to={`/admin/roombookings/detail/${booking.id}`}
                           className="text-sm font-black text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 group/link"
                         >
-                          Detail 
+                          Detail
                           <ChevronRight size={16} className="group-hover/link:translate-x-1 transition-transform" />
                         </Link>
                       </td>

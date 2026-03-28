@@ -8,18 +8,19 @@ export function useRooms() {
   const [searchQuery, setSearchQuery] = useState("");
   const [buildingFilter, setBuildingFilter] = useState("Semua");
 
+  const fetchRooms = async () => {
+    try {
+      setLoading(true);
+      const response = await roomService.getAllRooms();
+      setRooms(response.data);
+    } catch (error) {
+      console.error("Gagal mengambil data ruangan:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        setLoading(true);
-        const response = await roomService.getAllRooms();
-        setRooms(response.data);
-      } catch (error) {
-        console.error("Gagal mengambil data ruangan:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchRooms();
   }, []);
 
@@ -42,6 +43,7 @@ export function useRooms() {
     loading,
     setSearchQuery,
     setBuildingFilter,
-    buildingFilter
+    buildingFilter,
+    refreshRooms: fetchRooms
   };
 }

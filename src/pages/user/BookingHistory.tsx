@@ -1,5 +1,5 @@
-import { 
-  CalendarDays, ChevronRight, Clock, MapPin, Search, Loader2 
+import {
+  CalendarDays, ChevronRight, Clock, MapPin, Search, Loader2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "../../layouts/Navbar";
@@ -16,15 +16,15 @@ function BookingHistory() {
 
       <main className="max-w-6xl mx-auto p-6 space-y-6">
         <header className="space-y-4">
-          <BackButton label="Kembali ke Dashboard" mb="" />
+          <BackButton to="/dashboard" label="Kembali ke Dashboard" mb="" />
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <h2 className="text-3xl font-black tracking-tight text-gray-900">Riwayat Peminjaman</h2>
-            
+
             <div className="relative group">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-blue-500 transition-colors" size={18} />
-              <input 
-                type="text" 
-                placeholder="Cari ruangan atau tujuan..." 
+              <input
+                type="text"
+                placeholder="Cari ruangan atau tujuan..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2.5 bg-white border border-gray-200 rounded-2xl shadow-sm focus:ring-2 focus:ring-blue-500 outline-none transition-all w-full md:w-80 text-sm font-medium"
@@ -97,8 +97,8 @@ const BookingRow = ({ item }: { item: any }) => {
         </span>
       </td>
       <td className="px-8 py-6 text-right">
-        <Link 
-          to={`/roombookings/detail/${item.id}`} 
+        <Link
+          to={`/roombookings/detail/${item.id}`}
           className="p-2.5 bg-gray-50 text-gray-400 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-all inline-flex items-center group/btn"
         >
           <span className="sr-only">Detail</span>

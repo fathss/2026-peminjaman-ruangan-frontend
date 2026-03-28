@@ -8,9 +8,9 @@ import { useAllBookings } from "../../hooks/admin/useAdminAllBookings";
 import { formatFullDateTime } from "../../utils/dateFormatter";
 
 function AllBookingsPage() {
-  const { 
-    filteredBookings, loading, searchTerm, 
-    setSearchTerm, statusFilter, setStatusFilter, refresh 
+  const {
+    filteredBookings, loading, searchTerm,
+    setSearchTerm, statusFilter, setStatusFilter, refresh
   } = useAllBookings();
 
   return (
@@ -18,11 +18,11 @@ function AllBookingsPage() {
       <Navbar />
 
       <main className="max-w-7xl mx-auto p-6 space-y-6">
-        <BackButton label="Kembali" />
+        <BackButton to="/admin/dashboard" label="Kembali ke Dashboard" />
 
-        <PageHeader 
-          title="Semua Peminjaman" 
-          subtitle="Kelola dan tinjau seluruh riwayat pengajuan ruangan oleh user." 
+        <PageHeader
+          title="Semua Peminjaman"
+          subtitle="Kelola dan tinjau seluruh riwayat pengajuan ruangan oleh user."
         />
 
         {/* Search, Filter, & Refresh */}
@@ -72,7 +72,7 @@ function AllBookingsPage() {
               </thead>
               <tbody className="divide-y divide-gray-50">
                 {loading ? (
-                   <tr><td colSpan={5} className="px-8 py-20 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" size={32} /></td></tr>
+                  <tr><td colSpan={5} className="px-8 py-20 text-center"><Loader2 className="animate-spin mx-auto text-blue-600" size={32} /></td></tr>
                 ) : filteredBookings.length > 0 ? (
                   filteredBookings.map((booking) => {
                     const [date, time] = formatFullDateTime(booking.startTime).split(', ');
