@@ -12,6 +12,7 @@ import BookingHistory from "./pages/user/BookingHistory";
 import BookingFormPage from "./pages/user/BookingFormPage";
 import BookingDetailPage from "./pages/user/BookingDetailPage";
 import BookingEditPage from "./pages/user/BookingEditPage";
+import ServerError from "./pages/ServerError";
 
 function AppRoutes() {
   return (
@@ -34,6 +35,7 @@ function AppRoutes() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
       <Route path="/rooms" element={<RoomPage />} />
+      <Route path="/error" element={<ServerError />} />
 
       {/* Default Routes */}
       <Route path="/" element={<LoginPage />} />

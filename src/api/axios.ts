@@ -1,4 +1,5 @@
 import axios from "axios";
+import type { AxiosError } from "axios";
 
 const API_URL = "/api";
 
@@ -37,6 +38,23 @@ axiosInstance.interceptors.response.use(
         window.location.href = "/login";
       }
     }
+    return Promise.reject(error);
+  }
+);
+
+// Interceptor untuk Response: Menangani error server (misal: 500 Internal Server Error)
+axiosInstance.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const axiosError = error as AxiosError<{ message?: string }>;
+
+    const status = axiosError.response?.status ?? 502;
+    const isServerError = status >= 500 || !axiosError.response;
+
+    if (isServerError) {
+      window.location.href = `/error?status=${status}`;
+    }
+
     return Promise.reject(error);
   }
 );
