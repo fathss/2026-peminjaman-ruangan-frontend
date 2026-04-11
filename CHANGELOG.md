@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.2.2] - 2026-04-11
+
+### Fixed
+- Memperbarui header proxy dan timeout pada konfigurasi Nginx untuk meningkatkan kestabilan koneksi API.
+
+## [1.2.1] - 2026-04-06
+
+### Changed
+- Menyesuaikan konfigurasi Nginx dan base URL Axios untuk penanganan API yang lebih baik.
+- Memperbarui konfigurasi Vite agar alur request API lebih konsisten saat build dan runtime.
+
 ## [1.2.0] - 2026-03-28
 
 ### Added
