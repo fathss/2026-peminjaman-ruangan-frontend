@@ -10,6 +10,13 @@ const axiosInstance = axios.create({
   },
 });
 
+export const publicAxios = axios.create({
+  baseURL: API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+});
+
 // Interceptor untuk Request: Menyisipkan Token JWT sebelum request dikirim
 axiosInstance.interceptors.request.use(
   (config) => {

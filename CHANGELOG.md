@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.3] - 2026-04-13
+
+### Added
+- Menambahkan sistem health check backend dengan retry logic dan loading state di komponen App.
+
+### Changed
+- Memperbarui konten halaman ServerError dan aksi button untuk pengalaman pengguna yang lebih baik.
+
 ## [1.2.2] - 2026-04-11
 
 ### Fixed

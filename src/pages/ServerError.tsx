@@ -1,5 +1,5 @@
 import { useSearchParams } from "react-router-dom";
-import { AlertTriangle, House, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw } from "lucide-react";
 
 function ServerError() {
     const [searchParams] = useSearchParams();
@@ -23,22 +23,15 @@ function ServerError() {
                     </h1>
 
                     <p className="mt-3 text-sm md:text-base text-gray-500 max-w-xl mx-auto">
-                        Coba lagi nanti atau kembali ke halaman utama jika masalah masih berlanjut.
+                        Coba lagi nanti dalam waktu beberapa menit.
                     </p>
 
                     <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-3">
-                        <button
-                            onClick={() => window.location.reload()}
+                        <a
+                            href="/"
                             className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-2xl font-bold text-sm shadow-lg shadow-blue-100 transition-all active:scale-95"
                         >
                             <RefreshCw size={18} /> Coba Lagi
-                        </button>
-
-                        <a
-                            href="/"
-                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-white/80 backdrop-blur-sm hover:bg-white text-gray-700 px-6 py-3 rounded-2xl font-bold text-sm border border-gray-200 transition-all shadow-sm"
-                        >
-                            <House size={18} /> Kembali ke Beranda
                         </a>
                     </div>
                 </div>
