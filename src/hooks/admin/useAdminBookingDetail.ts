@@ -29,13 +29,15 @@ export function useAdminBooking(id: string | undefined) {
     }
   }, [id]);
 
-  const handleUpdateStatus = async (action: "Approve" | "Reject") => {
+  const handleUpdateStatus = async (action: "Approve" | "Reject", reason?: string) => {
     if (!id) return false;
+
+    if (action === "Reject" && !reason?.trim()) return false;
 
     try {
       setIsProcessing(true);
       if (action === "Approve") await bookingService.approveBooking(id);
-      else await bookingService.rejectBooking(id);
+      else await bookingService.rejectBooking(id, reason!);
 
       showToast({
         type: "success",

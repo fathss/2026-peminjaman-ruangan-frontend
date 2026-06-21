@@ -183,14 +183,22 @@ function BookingDetailPage() {
                         {formatFullDateTime(log.changedAt)}
                       </span>
                     </div>
-                    <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-50 flex items-center justify-between">
-                      <p className="text-sm text-gray-600 font-medium">
-                        Status diubah menjadi <span className="font-bold">{log.newStatus}</span>
-                      </p>
-                      {log.changedBy && (
-                        <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-gray-100 shadow-sm">
-                          <User size={10} className="text-gray-400" />
-                          <span className="text-[10px] font-bold text-gray-500">{log.changedBy}</span>
+                    <div className="bg-gray-50/50 rounded-2xl p-4 border border-gray-50">
+                      <div className="flex items-center justify-between">
+                        <p className="text-sm text-gray-600 font-medium">
+                          Status diubah menjadi <span className="font-bold">{log.newStatus}</span>
+                        </p>
+                        {log.changedBy && (
+                          <div className="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border border-gray-100 shadow-sm">
+                            <User size={10} className="text-gray-400" />
+                            <span className="text-[10px] font-bold text-gray-500">{log.changedBy}</span>
+                          </div>
+                        )}
+                      </div>
+                      {log.newStatus === "Rejected" && log.reason && (
+                        <div className="mt-3 bg-red-50 rounded-xl p-3 border border-red-100">
+                          <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">Alasan Penolakan</p>
+                          <p className="text-xs font-medium text-red-800 mt-1 italic">"{log.reason}"</p>
                         </div>
                       )}
                     </div>

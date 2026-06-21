@@ -44,6 +44,7 @@ export interface StatusHistory {
   newStatus: string;
   changedAt: string;
   changedBy: string;
+  reason?: string;
 }
 
 // ============================================

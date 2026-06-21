@@ -21,8 +21,10 @@ function AdminBookingDetailPage() {
     isOpen: false,
     action: null
   });
+  const [rejectReason, setRejectReason] = useState("");
 
   const openModal = (action: "Approve" | "Reject") => {
+    setRejectReason("");
     setModalConfig({ isOpen: true, action });
   };
 
@@ -34,7 +36,7 @@ function AdminBookingDetailPage() {
 
   const handleConfirmAction = async () => {
     if (!modalConfig.action) return;
-    const success = await handleUpdateStatus(modalConfig.action);
+    const success = await handleUpdateStatus(modalConfig.action, rejectReason || undefined);
     if (success) {
       setModalConfig({ isOpen: false, action: null });
     }
@@ -106,6 +108,12 @@ function AdminBookingDetailPage() {
                         </div>
                         <span className="text-gray-400 font-mono">{formatFullDateTime(log.changedAt)}</span>
                       </div>
+                      {log.newStatus === "Rejected" && log.reason && (
+                        <div className="mt-2 bg-red-50 rounded-xl p-3 border border-red-100">
+                          <p className="text-[10px] font-black text-red-600 uppercase tracking-widest">Alasan Penolakan</p>
+                          <p className="text-xs font-medium text-red-800 mt-1 italic">"{log.reason}"</p>
+                        </div>
+                      )}
                       <div className="flex items-center gap-2 pt-2 border-t border-gray-200/50">
                         <ShieldCheck size={12} className="text-blue-500" />
                         <p className="text-[10px] text-gray-500 italic">Oleh: <span className="font-bold text-gray-700">{log.changedBy || "System"}</span></p>
@@ -180,7 +188,7 @@ function AdminBookingDetailPage() {
               Batal
             </button>
             <button
-              disabled={isProcessing}
+              disabled={isProcessing || (modalConfig.action === "Reject" && !rejectReason.trim())}
               onClick={handleConfirmAction}
               className={`px-6 py-3 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all shadow-lg flex items-center gap-2 disabled:opacity-50
                 ${isApprove ? 'bg-green-600 hover:bg-green-700 shadow-green-100' : 'bg-red-600 hover:bg-red-700 shadow-red-100'}`}
@@ -198,13 +206,28 @@ function AdminBookingDetailPage() {
           <div className={`p-4 rounded-2xl ${isApprove ? 'bg-green-50 text-green-600' : 'bg-red-50 text-red-600'}`}>
             <AlertCircle size={32} />
           </div>
-          <div>
+          <div className="flex-1">
             <p className="font-bold text-gray-900">
               Apakah Anda yakin ingin {isApprove ? 'menyetujui' : 'menolak'} peminjaman ini?
             </p>
             <p className="text-sm">
               Tindakan ini akan memperbarui status peminjaman untuk ruangan <span className="font-bold text-gray-800">{booking.roomName}</span>.
             </p>
+            {modalConfig.action === "Reject" && (
+              <div className="mt-4">
+                <label className="text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                  Alasan Penolakan <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="Masukkan alasan mengapa peminjaman ini ditolak..."
+                  className="w-full mt-2 p-4 bg-gray-50 border border-gray-200 rounded-2xl text-sm font-medium resize-none focus:outline-none focus:ring-2 focus:ring-red-200 focus:border-red-300"
+                  rows={3}
+                  maxLength={500}
+                />
+              </div>
+            )}
           </div>
         </div>
       </Modal>
