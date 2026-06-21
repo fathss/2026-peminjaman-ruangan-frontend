@@ -99,20 +99,17 @@ export function useEditBooking(id: string | undefined) {
       if (validationErrors) {
         Object.keys(validationErrors).forEach((key) => {
           const fieldName = key.charAt(0).toLowerCase() + key.slice(1);
-
-          let message = validationErrors[key][0];
-
-          newErrors[fieldName] = message;
-        })
+          newErrors[fieldName] = validationErrors[key][0];
+        });
       }
 
-      const errorMessage = err.response?.data?.message
+      const errorMessage = err.response?.data?.message;
       if (errorMessage) {
-        if (errorMessage.toLowerCase().includes("waktu mulai")) {
-          newErrors["startTime"] = errorMessage;
-        } else if (errorMessage.toLowerCase().includes("waktu selesai")) {
-          newErrors["endTime"] = errorMessage;
-        }
+        showToast({
+          type: "danger",
+          message: "Gagal Menyimpan",
+          description: errorMessage,
+        });
       }
 
       setErrors(newErrors);
