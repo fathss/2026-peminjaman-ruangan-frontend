@@ -4,6 +4,19 @@ import * as bookingService from "../../services/bookingService";
 import { getRoomById } from "../../services/roomService";
 import { useToast } from "../../context/ToastContext";
 
+function extractDate(isoString: string): string {
+  const d = new Date(isoString);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+}
+
+function extractTime(isoString: string): string {
+  const d = new Date(isoString);
+  return `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+}
+
 export function useEditBooking(id: string | undefined) {
   const navigate = useNavigate();
   const { showToast } = useToast();
@@ -11,9 +24,10 @@ export function useEditBooking(id: string | undefined) {
   const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
-    purpose: "",
+    date: "",
     startTime: "",
     endTime: "",
+    purpose: "",
     roomName: "",
   });
 
@@ -21,6 +35,8 @@ export function useEditBooking(id: string | undefined) {
     location: "",
     capacity: 0
   });
+
+  const [roomId, setRoomId] = useState(0);
 
   const [errors, setErrors] = useState({ startTime: "", endTime: "", purpose: "" })
 
@@ -46,11 +62,14 @@ export function useEditBooking(id: string | undefined) {
         }
 
         setFormData({
-          purpose: roomBooking.purpose,
-          startTime: roomBooking.startTime.slice(0, 16),
-          endTime: roomBooking.endTime.slice(0, 16),
+          date: extractDate(roomBooking.startTime),
+          startTime: extractTime(roomBooking.startTime),
+          endTime: extractTime(roomBooking.endTime),
           roomName: roomBooking.roomName,
+          purpose: roomBooking.purpose,
         });
+
+        setRoomId(roomBooking.roomId);
 
         if (roomBooking.roomId) {
           const { data: room } = await getRoomById(roomBooking.roomId);
@@ -77,12 +96,21 @@ export function useEditBooking(id: string | undefined) {
 
     if (!id) return;
 
+    if (!formData.date || !formData.startTime || !formData.endTime) {
+      setErrors((prev) => ({
+        ...prev,
+        startTime: !formData.date || !formData.startTime ? "Pilih tanggal dan waktu mulai" : prev.startTime,
+        endTime: !formData.endTime ? "Pilih waktu selesai" : prev.endTime,
+      }));
+      return;
+    }
+
     try {
       setSubmitting(true);
       const payload = {
         purpose: formData.purpose,
-        startTime: new Date(formData.startTime).toISOString(),
-        endTime: new Date(formData.endTime).toISOString()
+        startTime: new Date(`${formData.date}T${formData.startTime}`).toISOString(),
+        endTime: new Date(`${formData.date}T${formData.endTime}`).toISOString()
       };
 
       await bookingService.updateBooking(id, payload);
@@ -123,5 +151,9 @@ export function useEditBooking(id: string | undefined) {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  return { formData, roomDetails, loading, submitting, handleChange, handleSubmit, errors };
+  const handleTimeSlotChange = (date: string, startTime: string, endTime: string) => {
+    setFormData((prev) => ({ ...prev, date, startTime, endTime }));
+  };
+
+  return { formData, roomDetails, roomId, loading, submitting, handleChange, handleTimeSlotChange, handleSubmit, errors };
 }

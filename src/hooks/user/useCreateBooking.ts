@@ -16,12 +16,15 @@ export function useCreateBooking() {
   const [roomData, setRoomData] = useState<Room>();
 
   const [formData, setFormData] = useState({
+    date: "",
     startTime: "",
     endTime: "",
     purpose: "",
   });
 
   const [errors, setErrors] = useState({ startTime: "", endTime: "", purpose: "" })
+
+  const parsedRoomId = roomId ? parseInt(roomId) : 0;
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -43,6 +46,10 @@ export function useCreateBooking() {
     setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  const handleTimeSlotChange = (date: string, startTime: string, endTime: string) => {
+    setFormData((prev) => ({ ...prev, date, startTime, endTime }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!roomId || roomId === "0") {
@@ -52,12 +59,21 @@ export function useCreateBooking() {
 
     setErrors({ startTime: "", endTime: "", purpose: "" });
 
+    if (!formData.date || !formData.startTime || !formData.endTime) {
+      setErrors((prev) => ({
+        ...prev,
+        startTime: !formData.date || !formData.startTime ? "Pilih tanggal dan waktu mulai" : prev.startTime,
+        endTime: !formData.endTime ? "Pilih waktu selesai" : prev.endTime,
+      }));
+      return;
+    }
+
     setIsLoading(true);
     try {
       const payload = {
         roomId: parseInt(roomId),
-        startTime: new Date(formData.startTime).toISOString(),
-        endTime: new Date(formData.endTime).toISOString(),
+        startTime: new Date(`${formData.date}T${formData.startTime}`).toISOString(),
+        endTime: new Date(`${formData.date}T${formData.endTime}`).toISOString(),
         purpose: formData.purpose,
       };
 
@@ -100,8 +116,10 @@ export function useCreateBooking() {
     isLoading,
     isRoomLoading,
     handleChange,
+    handleTimeSlotChange,
     handleSubmit,
     roomId,
+    parsedRoomId,
     errors
   };
 }

@@ -1,8 +1,8 @@
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Send, Calendar, FileText, Loader2 } from "lucide-react";
+import { ArrowLeft, Send, FileText, Loader2 } from "lucide-react";
 import Navbar from "../../layouts/Navbar";
-import FormField from "../../components/FormField";
 import FormTextArea from "../../components/FormTextArea";
+import TimeSlotPicker from "../../components/TimeSlotPicker";
 import BookingSummary from "../../components/BookingSummary";
 import { useCreateBooking } from "../../hooks/user/useCreateBooking";
 import { parseLocation } from "../../utils/locationParser";
@@ -15,7 +15,9 @@ function BookingFormPage() {
     isLoading,
     isRoomLoading,
     handleChange,
+    handleTimeSlotChange,
     handleSubmit,
+    parsedRoomId,
     errors
   } = useCreateBooking();
 
@@ -55,28 +57,14 @@ function BookingFormPage() {
                   required
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    label="Tanggal Mulai"
-                    name="startTime"
-                    type="datetime-local"
-                    value={formData.startTime}
-                    error={errors.startTime}
-                    onChange={handleChange}
-                    icon={<Calendar size={18} />}
-                    required
-                  />
-                  <FormField
-                    label="Tanggal Selesai"
-                    name="endTime"
-                    type="datetime-local"
-                    value={formData.endTime}
-                    error={errors.endTime}
-                    onChange={handleChange}
-                    icon={<Calendar size={18} />}
-                    required
-                  />
-                </div>
+                <TimeSlotPicker
+                  roomId={parsedRoomId}
+                  selectedDate={formData.date}
+                  startTime={formData.startTime}
+                  endTime={formData.endTime}
+                  onChange={handleTimeSlotChange}
+                  errors={{ startTime: errors.startTime, endTime: errors.endTime }}
+                />
 
                 <button
                   type="submit"

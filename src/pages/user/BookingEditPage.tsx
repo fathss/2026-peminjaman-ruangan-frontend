@@ -1,15 +1,15 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Save, Loader2, Calendar, FileText } from "lucide-react";
+import { ArrowLeft, Save, Loader2, FileText } from "lucide-react";
 import Navbar from "../../layouts/Navbar";
-import FormField from "../../components/FormField";
 import FormTextArea from "../../components/FormTextArea";
+import TimeSlotPicker from "../../components/TimeSlotPicker";
 import BookingSummary from "../../components/BookingSummary";
 import { useEditBooking } from "../../hooks/user/useEditBooking";
 
 function BookingEditPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { formData, roomDetails, loading, submitting, handleChange, handleSubmit, errors } = useEditBooking(id);
+  const { formData, roomDetails, roomId, loading, submitting, handleChange, handleTimeSlotChange, handleSubmit, errors } = useEditBooking(id);
 
   const parseLocation = (location: string) => {
     if (!location) return { building: "-", floor: "-" };
@@ -64,28 +64,15 @@ function BookingEditPage() {
                   required
                 />
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <FormField
-                    label="Tanggal Mulai"
-                    name="startTime"
-                    type="datetime-local"
-                    value={formData.startTime}
-                    onChange={handleChange}
-                    error={errors.startTime}
-                    icon={<Calendar size={18} />}
-                    required
-                  />
-                  <FormField
-                    label="Tanggal Selesai"
-                    name="endTime"
-                    type="datetime-local"
-                    value={formData.endTime}
-                    onChange={handleChange}
-                    error={errors.endTime}
-                    icon={<Calendar size={18} />}
-                    required
-                  />
-                </div>
+                <TimeSlotPicker
+                  roomId={roomId}
+                  selectedDate={formData.date}
+                  startTime={formData.startTime}
+                  endTime={formData.endTime}
+                  onChange={handleTimeSlotChange}
+                  errors={{ startTime: errors.startTime, endTime: errors.endTime }}
+                  excludeBookingId={id ? Number(id) : undefined}
+                />
 
                 <button
                   type="submit"
